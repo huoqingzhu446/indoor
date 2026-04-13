@@ -106,10 +106,30 @@ OSS_PUBLIC_BASE_URL=http://YOUR_SERVER_IP/static
 
 ## 5. 启动项目
 
-使用基础 compose 加生产覆盖文件启动：
+推荐直接使用根目录的一键脚本：
 
 ```bash
-docker compose --env-file .env.production -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+bash deploy.sh
+```
+
+脚本会自动执行这些操作：
+
+- `git pull --rebase --autostash`
+- `docker compose up -d --build --pull never`
+- 在 `api` 容器中执行 Prisma `db push`
+- 对 `/`、`/admin/`、`/api/`、`/api/docs` 做本机健康检查
+- 对 `ai-service` 的 `/health` 做容器内健康检查
+
+如果你当前只想部署服务器上已有代码，不拉远端最新提交：
+
+```bash
+bash deploy.sh --no-pull
+```
+
+如果你只想看原始 compose 启动命令，也可以手动执行：
+
+```bash
+docker compose --env-file .env.production -f docker-compose.yml -f docker-compose.prod.yml up -d --build --pull never
 ```
 
 查看状态：
@@ -126,10 +146,10 @@ docker compose --env-file .env.production -f docker-compose.yml -f docker-compos
 
 ## 6. 初始化数据库
 
-当前 API 使用 Prisma，首次启动后需要把 schema 推到数据库：
+当前 API 使用 Prisma。`deploy.sh` 默认会自动执行数据库同步；如果你要手动执行，请用容器里的本地 Prisma CLI：
 
 ```bash
-docker compose --env-file .env.production -f docker-compose.yml -f docker-compose.prod.yml exec api pnpm prisma:push
+docker compose --env-file .env.production -f docker-compose.yml -f docker-compose.prod.yml exec api sh -lc './node_modules/.bin/prisma db push'
 ```
 
 如果之后 schema 变更，再重复执行一次即可。
@@ -194,4 +214,26 @@ docker system df
 
 ```bash
 docker system prune -f
+```
+
+## 10. 后续发布
+
+以后本地改完代码后，推荐流程是：
+
+1. 本地提交并推送到远端
+2. SSH 登录服务器
+3. 进入项目目录执行 `bash deploy.sh`
+
+常见发布命令：
+
+```bash
+cd /srv/room-ai
+bash deploy.sh
+```
+
+如果服务器工作区里有你临时修改的内容，不适合直接 `git pull`，可以改用：
+
+```bash
+cd /srv/room-ai
+bash deploy.sh --no-pull
 ```
