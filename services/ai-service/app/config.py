@@ -2,7 +2,22 @@ from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-ROOT_ENV_FILE = Path(__file__).resolve().parents[3] / ".env"
+
+def discover_env_files() -> tuple[str, ...]:
+    current = Path(__file__).resolve()
+    env_files: list[str] = []
+
+    # In local development we want to pick up the repo-root `.env`.
+    # In containers there may be no file at all, so we should fall back to
+    # process environment variables instead of crashing on a fixed parent depth.
+    for parent in current.parents:
+        candidate = parent / ".env"
+        if candidate.exists():
+            env_files.append(str(candidate))
+            break
+
+    env_files.append(".env")
+    return tuple(dict.fromkeys(env_files))
 
 
 class Settings(BaseSettings):
@@ -17,7 +32,7 @@ class Settings(BaseSettings):
     app_base_url: str = "http://localhost:3000"
 
     model_config = SettingsConfigDict(
-        env_file=(str(ROOT_ENV_FILE), ".env"),
+        env_file=discover_env_files(),
         extra="ignore",
     )
 
