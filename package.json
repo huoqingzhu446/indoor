@@ -1,0 +1,13 @@
+{
+  "name": "room-ai-platform",
+  "private": true,
+  "packageManager": "pnpm@10.15.1",
+  "scripts": {
+    "dev:user-web": "pnpm --filter user-web dev",
+    "dev:admin-web": "pnpm --filter admin-web dev",
+    "dev:api": "pnpm --filter api start:dev",
+    "dev:worker": "pnpm --filter worker dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint"
+  }
+}

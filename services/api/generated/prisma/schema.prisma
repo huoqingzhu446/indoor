@@ -1,0 +1,217 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ProjectStatus {
+  draft
+  rendered
+  archived
+}
+
+enum RenderTaskStatus {
+  queued
+  processing
+  completed
+  failed
+}
+
+enum ShareStatus {
+  active
+  disabled
+}
+
+enum AssetKind {
+  original
+  render
+  cover
+  thumbnail
+}
+
+enum ModelType {
+  text
+  image
+}
+
+model UploadTicket {
+  id          String   @id @default(cuid())
+  fileName    String
+  contentType String
+  fileSize    Int
+  objectKey   String
+  publicUrl   String
+  expiresIn   Int      @default(3600)
+  status      String   @default("issued")
+  createdAt   DateTime @default(now())
+}
+
+model User {
+  id        String    @id @default(cuid())
+  phone     String?   @unique
+  nickname  String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  projects  Project[]
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  role         String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Project {
+  id                 String              @id @default(cuid())
+  userId             String?
+  name               String
+  roomType           String
+  styleCode          String
+  budgetLevel        String
+  status             ProjectStatus       @default(draft)
+  originalImageUrl   String
+  latestRenderTaskId String?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  user               User?               @relation(fields: [userId], references: [id])
+  assets             ProjectAsset[]
+  renderTasks        RenderTask[]
+  renderResults      RenderResult[]
+  shareLinks         ShareLink[]
+  constraints        ProjectConstraint[]
+}
+
+model ProjectConstraint {
+  id        String   @id @default(cuid())
+  projectId String
+  value     String
+  createdAt DateTime @default(now())
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model ProjectAsset {
+  id          String    @id @default(cuid())
+  projectId   String
+  kind        AssetKind
+  fileName    String?
+  objectKey   String
+  publicUrl   String
+  contentType String?
+  fileSize    Int?
+  createdAt   DateTime  @default(now())
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model RenderTask {
+  id              String           @id @default(cuid())
+  projectId       String
+  providerCode    String
+  modelCode       String
+  styleCode       String
+  budgetLevel     String
+  constraints     String[]
+  candidateCount  Int              @default(4)
+  status          RenderTaskStatus @default(queued)
+  progressPercent Int              @default(0)
+  requestPayload  Json?
+  responseSummary Json?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  project         Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  results         RenderResult[]
+}
+
+model RenderResult {
+  id           String     @id @default(cuid())
+  projectId    String
+  renderTaskId String
+  title        String
+  imageUrl     String
+  score        Float
+  styleCode    String
+  createdAt    DateTime   @default(now())
+  renderTask   RenderTask @relation(fields: [renderTaskId], references: [id], onDelete: Cascade)
+  project      Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model ShareLink {
+  id          String      @id @default(cuid())
+  projectId   String
+  shareCode   String      @unique
+  shareUrl    String
+  title       String
+  description String
+  status      ShareStatus @default(active)
+  createdAt   DateTime    @default(now())
+  project     Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model AiProvider {
+  id               String    @id @default(cuid())
+  providerCode     String    @unique
+  providerName     String
+  baseUrl          String
+  apiKeyRef        String
+  timeoutMs        Int       @default(30000)
+  retryLimit       Int       @default(2)
+  dailyBudgetLimit Decimal?  @db.Decimal(10, 2)
+  enabled          Boolean   @default(true)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  models           AiModel[]
+}
+
+model AiModel {
+  id                     String     @id @default(cuid())
+  providerId             String
+  modelCode              String
+  displayName            String
+  modelType              ModelType
+  enabled                Boolean    @default(true)
+  isDefault              Boolean    @default(false)
+  temperature            Float?
+  topP                   Float?
+  imageSize              String?
+  aspectRatio            String?
+  candidateCount         Int?
+  responseFormat         String?
+  promptOptimizerEnabled Boolean    @default(false)
+  createdAt              DateTime   @default(now())
+  updatedAt              DateTime   @updatedAt
+  provider               AiProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+}
+
+model PromptTemplate {
+  id             String   @id @default(cuid())
+  sceneType      String
+  styleCode      String
+  promptTemplate String
+  negativePrompt String?
+  enabled        Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model StylePreset {
+  id                     String   @id @default(cuid())
+  styleCode              String   @unique
+  styleName              String
+  coverImage             String?
+  roomTypes              String[]
+  promptTemplate         String
+  negativePromptTemplate String?
+  materialKeywords       String[]
+  lightingKeywords       String[]
+  furnitureKeywords      String[]
+  colorPalette           String[]
+  sortOrder              Int      @default(0)
+  enabled                Boolean  @default(true)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+}

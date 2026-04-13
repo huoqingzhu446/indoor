@@ -1,0 +1,230 @@
+:root {
+  font-family: 'Manrope', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+  color: #1b2a2f;
+  background:
+    radial-gradient(circle at top left, rgba(219, 236, 235, 0.8), transparent 36%),
+    linear-gradient(180deg, #edf3f2 0%, #e2ebea 100%);
+  --admin-surface: rgba(255, 255, 255, 0.82);
+  --admin-surface-strong: rgba(255, 255, 255, 0.94);
+  --admin-line: rgba(26, 50, 56, 0.12);
+  --admin-text: #1b2a2f;
+  --admin-text-soft: #63777c;
+  --admin-brand: #1f6a73;
+  --admin-brand-dark: #12464c;
+  --admin-shadow: 0 22px 50px rgba(20, 49, 53, 0.1);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--admin-text);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.admin-shell {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.admin-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 28px 20px;
+  border-right: 1px solid var(--admin-line);
+  background: rgba(245, 249, 248, 0.92);
+  backdrop-filter: blur(12px);
+}
+
+.admin-eyebrow {
+  margin: 0 0 8px;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--admin-text-soft);
+}
+
+.admin-brand {
+  margin: 0;
+  font-family: 'Fraunces', 'Songti SC', serif;
+  font-size: 34px;
+}
+
+.admin-nav {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-nav-link,
+.admin-header-link {
+  border-radius: 20px;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.admin-nav-link {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 1px solid transparent;
+  color: var(--admin-text-soft);
+}
+
+.admin-nav-link.active {
+  color: var(--admin-brand-dark);
+  border-color: rgba(31, 106, 115, 0.18);
+  background: rgba(31, 106, 115, 0.08);
+}
+
+.admin-nav-link small {
+  color: inherit;
+}
+
+.admin-main {
+  padding: 24px;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.admin-header-note {
+  margin: 0 0 6px;
+  color: var(--admin-text-soft);
+  font-size: 13px;
+}
+
+.admin-page-title {
+  margin: 0;
+  font-family: 'Fraunces', 'Songti SC', serif;
+  font-size: clamp(30px, 4vw, 42px);
+}
+
+.admin-header-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 18px;
+  color: #f2fbfb;
+  background: linear-gradient(135deg, var(--admin-brand) 0%, #2894a0 100%);
+  box-shadow: 0 12px 28px rgba(31, 106, 115, 0.22);
+}
+
+.admin-grid-4,
+.admin-grid-2,
+.admin-stack {
+  display: grid;
+  gap: 16px;
+}
+
+.admin-grid-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.admin-grid-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.admin-card,
+.admin-placeholder {
+  padding: 20px;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-line);
+  border-radius: 28px;
+  backdrop-filter: blur(14px);
+  box-shadow: var(--admin-shadow);
+}
+
+.admin-card h3,
+.admin-placeholder h3 {
+  margin: 0 0 10px;
+  font-size: 20px;
+}
+
+.admin-card p,
+.admin-placeholder p {
+  margin: 0;
+  color: var(--admin-text-soft);
+  line-height: 1.6;
+}
+
+.admin-stat {
+  margin: 0;
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--admin-brand-dark);
+}
+
+.admin-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.admin-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(31, 106, 115, 0.1);
+  color: var(--admin-brand-dark);
+}
+
+.table-card .el-table {
+  --el-table-bg-color: transparent;
+  --el-table-tr-bg-color: transparent;
+  --el-table-header-bg-color: rgba(31, 106, 115, 0.05);
+  --el-table-border-color: rgba(26, 50, 56, 0.08);
+}
+
+.table-card .el-table th.el-table__cell {
+  color: var(--admin-brand-dark);
+}
+
+.provider-list {
+  display: grid;
+  gap: 14px;
+}
+
+@media (max-width: 1080px) {
+  .admin-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-sidebar {
+    border-right: none;
+    border-bottom: 1px solid var(--admin-line);
+  }
+
+  .admin-grid-4,
+  .admin-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}

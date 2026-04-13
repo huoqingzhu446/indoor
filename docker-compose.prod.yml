@@ -1,0 +1,30 @@
+services:
+  nginx:
+    restart: unless-stopped
+
+  user-web:
+    restart: unless-stopped
+
+  admin-web:
+    restart: unless-stopped
+
+  api:
+    restart: unless-stopped
+
+  ai-service:
+    restart: unless-stopped
+
+  worker:
+    restart: unless-stopped
+
+  postgres:
+    restart: unless-stopped
+    ports: []
+
+  redis:
+    restart: unless-stopped
+    ports: []
+
+  minio:
+    restart: unless-stopped
+    ports: []
